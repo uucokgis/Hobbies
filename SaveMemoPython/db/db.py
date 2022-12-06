@@ -17,12 +17,21 @@ remember_table = Table(
 meta.create_all(dbcon)
 
 
-def get_remembers() -> [str]:
-    data = dbcon.execute('select * from remember')
-    print("data ", data)
-    return data
+def get_remembers(get_dates=True) -> [str]:
+    text_data = []
+    data = dbcon.execute('select data, tarih from remember')
+    data = data.fetchall()
+    for i in data:
+        if get_dates:
+            i = " - Tarih: ".join(i)
+        else:
+            i = i[0]
+        text_data.append(i)
+
+    return text_data
 
 
 def save_text(data: str, ) -> None:
-    ins = remember_table.insert().values(data=data, tarih=datetime.utcnow())
-    dbcon.engine.execute(ins)
+    if data and data != "":
+        ins = remember_table.insert().values(data=data, tarih=datetime.utcnow())
+        dbcon.engine.execute(ins)

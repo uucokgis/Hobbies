@@ -1,37 +1,33 @@
-from enum import Enum
-
 import PySimpleGUI as pg
 
-from SaveMemoPython.db.db import save_text
+from SaveMemoPython.db.db import save_text, get_remembers
 
 pg.theme('DarkAmber')
 
 
-class GUIEnum(Enum):
-    GET = 0
-    POST = 1
-
-
 class GUI:
+    get_date_option = False
+    layout = [
+        [pg.Button('Store texts'),
+         pg.Checkbox('Show dates', key='-DATECB-'),
+         pg.Multiline(size=(50, 25), expand_y=True, expand_x=True, key='-STORE-'),
+         pg.Listbox(values=get_remembers(get_date_option), size=(50, 25), enable_events=True, key='-RLIST-')]
+    ]
+    window = pg.Window('Remember', layout, auto_size_text=True, auto_size_buttons=True,
+                       resizable=True, finalize=True)
+    window['-STORE-'].bind("<Return>", "CTRL-Enter")
 
-    gui_types: GUIEnum = GUIEnum.GET
-    get_texts: [str] = []
+    def refresh_texts(self):
+        datas = get_remembers(self.get_date_option)
+        self.window['-RLIST-'].update(datas)
 
-    def __init__(self):
-        self.window = pg.Window('Remember', self.handle_layouts(), auto_size_text=True, auto_size_buttons=True, resizable=True)
+    def clean_texts(self):
+        self.window['-STORE-'].update("")
 
-    def handle_layouts(self):
-        if self.gui_types == GUIEnum.GET:
-            layout = [
-                [pg.Button('Store texts'),
-                 pg.Multiline(size=(50, 150), expand_y=True, expand_x=True)]]
-        elif self.gui_types == GUIEnum.POST:
-            layout = []
-
-        else:
-            layout = []
-
-        return layout
+    def save_texts(self, data):
+        save_text(data)
+        self.refresh_texts()
+        self.clean_texts()
 
     def start(self):
         while True:
@@ -39,5 +35,10 @@ class GUI:
             if event == pg.WIN_CLOSED or event == 'Cancel':
                 break
             if event == 'Store texts':
-                print("Storing..")
-                save_text(values[0])
+                self.save_texts(values['-STORE-'])
+
+            if values['-DATECB-']:
+                self.get_date_option = values['-DATECB-']
+
+            if event == "-STORE-" + "CTRL-Enter":
+                self.save_texts(values['-STORE-'])
