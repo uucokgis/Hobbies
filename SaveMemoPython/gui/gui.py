@@ -1,7 +1,8 @@
 from enum import Enum
-from SaveMemoPython.db.db import get_remembers, save_text
 
 import PySimpleGUI as pg
+
+from SaveMemoPython.db.db import save_text
 
 pg.theme('DarkAmber')
 
@@ -12,26 +13,25 @@ class GUIEnum(Enum):
 
 
 class GUI:
-    layout = [
-        [pg.Button('Store texts'),
-         pg.Multiline(size=(50, 300), expand_y=True, expand_x=True)],
-        [pg.Button('Ok'), pg.Button('Cancel')]]
-    window = pg.Window('Remember', layout, auto_size_text=True, auto_size_buttons=True, resizable=True)
 
     gui_types: GUIEnum = GUIEnum.GET
     get_texts: [str] = []
 
     def __init__(self):
-        pass
+        self.window = pg.Window('Remember', self.handle_layouts(), auto_size_text=True, auto_size_buttons=True, resizable=True)
 
-    def save_text(self, text):
-        save_text(text)
-
-    def handle_inputs(self):
+    def handle_layouts(self):
         if self.gui_types == GUIEnum.GET:
-            pass
+            layout = [
+                [pg.Button('Store texts'),
+                 pg.Multiline(size=(50, 150), expand_y=True, expand_x=True)]]
         elif self.gui_types == GUIEnum.POST:
-            pass
+            layout = []
+
+        else:
+            layout = []
+
+        return layout
 
     def start(self):
         while True:
@@ -40,4 +40,4 @@ class GUI:
                 break
             if event == 'Store texts':
                 print("Storing..")
-                self.save_text(values[0])
+                save_text(values[0])
