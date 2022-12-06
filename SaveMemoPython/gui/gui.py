@@ -1,4 +1,5 @@
 import tkinter as tk
+from SaveMemoPython.customs.textWidget import Text
 from SaveMemoPython.db.db import get_remembers
 from enum import Enum
 
@@ -11,18 +12,23 @@ class GUIEnum(Enum):
 class GUI:
     root = tk.Tk()
     root.title('Remember')
-    root.geometry("1000x400")
+    root.geometry("600x400")
 
     gui_types: GUIEnum = GUIEnum.GET
     stored_texts: [str] = []
+    typing_text = tk.StringVar()
 
     def __init__(self):
+        self.frame = tk.Frame(self.root, bg='red')
+        self.frame.pack()
         self.handle_inputs()
 
     def add_entry_text(self):
         # store text
-        ent = tk.Text(self.root, width=400, font='Arial 24')
-        ent.grid(row=1, column=0)
+        entLabel = tk.Label(self.frame, text='Entry Text', justify=tk.CENTER)
+        entLabel.grid(row=1, column=1)
+        ent = Text(self.frame, font='Arial 24', textvariable=self.typing_text)
+        ent.grid(row=2, column=1)
 
     def fill_stored_texts(self):
         data = get_remembers()
