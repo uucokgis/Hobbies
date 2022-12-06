@@ -15,3 +15,7 @@ def get_remembers() -> [str]:
     data = dbcon.execute('select * from remember')
     print("data ", data)
     return data
+
+
+def save_text(text: str) -> None:
+    dbcon.execute(f'insert into remember (remember) values({text})')

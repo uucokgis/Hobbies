@@ -1,7 +1,9 @@
-import tkinter as tk
-from SaveMemoPython.customs.textWidget import Text
-from SaveMemoPython.db.db import get_remembers
 from enum import Enum
+from SaveMemoPython.db.db import get_remembers, save_text
+
+import PySimpleGUI as pg
+
+pg.theme('DarkAmber')
 
 
 class GUIEnum(Enum):
@@ -10,38 +12,32 @@ class GUIEnum(Enum):
 
 
 class GUI:
-    root = tk.Tk()
-    root.title('Remember')
-    root.geometry("600x400")
+    layout = [
+        [pg.Button('Store texts'),
+         pg.Multiline(size=(50, 300), expand_y=True, expand_x=True)],
+        [pg.Button('Ok'), pg.Button('Cancel')]]
+    window = pg.Window('Remember', layout, auto_size_text=True, auto_size_buttons=True, resizable=True)
 
     gui_types: GUIEnum = GUIEnum.GET
-    stored_texts: [str] = []
-    typing_text = tk.StringVar()
+    get_texts: [str] = []
 
     def __init__(self):
-        self.frame = tk.Frame(self.root, bg='red')
-        self.frame.pack()
-        self.handle_inputs()
+        pass
 
-    def add_entry_text(self):
-        # store text
-        entLabel = tk.Label(self.frame, text='Entry Text', justify=tk.CENTER)
-        entLabel.grid(row=1, column=1)
-        ent = Text(self.frame, font='Arial 24', textvariable=self.typing_text)
-        ent.grid(row=2, column=1)
-
-    def fill_stored_texts(self):
-        data = get_remembers()
-        self.stored_texts = data
-
-    def add_get_text(self):
-        listBox = tk.Listbox(self.root, listvariable=self.stored_texts, selectmode=tk.MULTIPLE)
+    def save_text(self, text):
+        save_text(text)
 
     def handle_inputs(self):
         if self.gui_types == GUIEnum.GET:
-            self.add_entry_text()
+            pass
         elif self.gui_types == GUIEnum.POST:
-            self.add_get_text()
+            pass
 
     def start(self):
-        self.root.mainloop()
+        while True:
+            event, values = self.window.read()
+            if event == pg.WIN_CLOSED or event == 'Cancel':
+                break
+            if event == 'Store texts':
+                print("Storing..")
+                self.save_text(values[0])
