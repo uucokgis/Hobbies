@@ -11,6 +11,7 @@ class GUI:
         [pg.Button('Store texts'),
          pg.Checkbox('Show dates', key='-DATECB-'),
          pg.Multiline(size=(50, 25), expand_y=True, expand_x=True, key='-STORE-'),
+         # todo: put filter search box
          pg.Listbox(values=get_remembers(get_date_option), size=(50, 25), enable_events=True, key='-RLIST-')]
     ]
     window = pg.Window('Remember', layout, auto_size_text=True, auto_size_buttons=True,
